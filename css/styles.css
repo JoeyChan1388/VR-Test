@@ -1,0 +1,23 @@
+@keyframes blur-in {
+    from {
+      backdrop-filter: blur(0px);
+    }
+    to {
+      backdrop-filter: blur(1px);
+    }
+  }
+
+.loading-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: none;
+}
+
+.visible {
+    display: block;
+    animation: blur-in 500ms forwards;
+}

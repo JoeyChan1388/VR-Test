@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VR Test</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <div id="loading-screen" class="loading-modal"></div>
+    <!-- Cursor for onclick functions -->
+    <a-scene cursor="rayOrigin: mouse">
+        <a-camera fov="60"></a-camera>
+
+      <a-sky></a-sky>
+    </a-scene>
+  </body>
+  <script>
+    //Array of scene objects
+    const scenes = [
+      {
+        name: "Scene_One",
+        sky: "./tiles/low_resolution/1.jpg",
+        images: [
+          {
+            src: "./img/EOIC-red.png",
+            position: "-8.31332 0.19753 5.02042",
+            rotation: "0 103.31 0",
+            scale: "1 1 1",
+            scene: "Scene_Two",
+            height: "1.3",
+            width: "1",
+          },
+        ],
+      },
+      {
+        name: "Scene_Two",
+        sky: "./tiles/low_resolution/2.jpg",
+        images: [
+          {
+            src: "./img/EOIC-red.png",
+            position: "-13.95014 1.0147 -16.17404",
+            rotation: "0 48.86 0",
+            scale: "1.3 1.3 1",
+            scene: "Scene_One",
+            height: "1.3",
+            width: "1",
+          },
+        ],
+      },
+    ];
+
+    function log() {
+      console.log("hello");
+    }
+
+    // Clears the scene of all a-image elements
+    function clearScene() {
+      //Find all a-image elements
+      const images = document.querySelectorAll("a-image");
+
+      //Remove all a-image elements
+      images.forEach((image) => {
+        image.parentNode.removeChild(image);
+      });
+    }
+
+    // Changes the scene to the second image
+    function changeScene(sceneName) {
+      let newScene = null;
+
+      // Find the scene info from the scenes array
+      scenes.map((scene) => {
+        if (scene.name === sceneName) {
+          newScene = scene;
+        }
+      });
+
+      if (newScene === null) {
+        return;
+      }
+
+      // Clear the scene of any images
+      clearScene();
+
+      //Make loading screen visible for 2 seconds
+      const loadingScreen = document.getElementById("loading-screen");
+      loadingScreen.classList.add("visible");
+
+      // Change the sky texture
+      const sky = document.querySelector("a-sky");
+      sky.setAttribute("src", newScene.sky);
+
+      // Add the new images to the scene
+      newScene.images.map((image) => {
+        const newImage = document.createElement("a-image");
+
+        // Set the attributes of the new image
+        newImage.setAttribute("src", image.src);
+        newImage.setAttribute("position", image.position);
+        newImage.setAttribute("rotation", image.rotation);
+        newImage.setAttribute("height", image.height);
+        newImage.setAttribute("width", image.width);
+        newImage.setAttribute("onclick", `changeScene("${image.scene}")`);
+        newImage.setAttribute("geometry", "primitive: plane");
+        document.querySelector("a-scene").appendChild(newImage);
+
+        //Make new image look at the camera
+        newImage.addEventListener("loaded", () => {
+          newImage.setAttribute("look-at", "0 0 0");
+        });
+      });
+
+      //Wait for the sky texture to load
+      sky.addEventListener("materialtextureloaded", () => {
+        loadingScreen.classList.remove("visible");
+      });
+    }
+
+    changeScene("Scene_One");
+  </script>
+</html>
